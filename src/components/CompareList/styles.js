@@ -9,6 +9,7 @@ export const Container = styled.div`
 `;
 
 export const Repository = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
 
@@ -16,6 +17,13 @@ export const Repository = styled.div`
   background: #fff;
   border-radius: 3px;
   margin: 0 10px;
+
+  .remove {
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    top: 10px;
+  }
 
   header {
     padding: 30px;
@@ -54,7 +62,7 @@ export const Repository = styled.div`
       }
 
       &:nth-child(2n - 1) {
-        background: #f5f5f5;
+        background: #ececec;
       }
     }
   }

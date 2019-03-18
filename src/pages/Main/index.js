@@ -17,30 +17,53 @@ export default class Main extends Component {
     repositories: [],
   };
 
+  async componentDidMount() {
+    this.setState({ loading: true });
+    this.setState({ loading: false, repositories: await this.getSavedRepositories() });
+  }
+
   handleAddRepository = async (e) => {
     e.preventDefault();
 
     this.setState({ loading: true });
 
-    const { repositories, repositoryInput } = this.state;
+    const { repositoryInput, repositories } = this.state;
 
     try {
       const { data: repository } = await api.get(`/repos/${repositoryInput}`);
 
-      repository.lastCommit = moment(repository.pushed_at).fromNow();
+      repository.last_commit = moment(repository.pushed_at).fromNow();
 
       this.setState({
+        repositoryError: false,
         repositoryInput: '',
         repositories: [...repositories, repository],
-        repositoryError: false,
       });
-      console.log(repository);
+
+      const localRepositories = await this.getSavedRepositories();
+
+      await localStorage.setItem(
+        '@GitCompare:repositories',
+        JSON.stringify([...localRepositories, repository]),
+      );
     } catch (err) {
       this.setState({ repositoryError: true });
     } finally {
       this.setState({ loading: false });
     }
   };
+
+  handleRemoveRepository = async (id) => {
+    const { repositories } = this.state;
+
+    const updatedRepositories = repositories.filter(repository => repository.id !== id);
+
+    this.setState({ repositories: updatedRepositories });
+
+    await localStorage.setItem('@GitCompare:repositories', JSON.stringify(updatedRepositories));
+  };
+
+  getSavedRepositories = async () => JSON.parse(await localStorage.getItem('@GitCompare:repositories')) || [];
 
   render() {
     const {
@@ -57,9 +80,11 @@ export default class Main extends Component {
             value={repositoryInput}
             onChange={e => this.setState({ repositoryInput: e.target.value })}
           />
-          <button type="submit">{loading ? <i className="fa fa-spinner fa-pulse" /> : 'OK'}</button>
+          <button type="submit">
+            {loading ? <i className="fa fa-spinner fa-pulse" /> : 'ADD'}
+          </button>
         </Form>
-        <CompareList repositories={repositories} />
+        <CompareList repositories={repositories} removeRepository={this.handleRemoveRepository} />
       </Container>
     );
   }

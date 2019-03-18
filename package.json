@@ -6,6 +6,7 @@
     "axios": "^0.18.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.24.0",
+    "octicons-react": "^0.17.12",
     "prop-types": "^15.7.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
